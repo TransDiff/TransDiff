@@ -60,6 +60,10 @@ For convenience, our pre-trained TransDiff models can be downloaded directly her
 | [TransDiff-H MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_h_mrar/checkpoint-last.pth?download=true)   | 1.42    | 301.2           | 1.3B    |
 | [TransDiff-L 512x512](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l_512/checkpoint-last.pth?download=true) | 2.51    | 286.6           | 683M    |
 
+### (Optional) Download Other Files 
+Download necessary [file](https://huggingface.co/zhendch/Transdiff/resolve/main/VIRTUAL_imagenet512.npz?download=true) and put it into folder `fid_stats/`, if you want to run evaluation on ImageNet 512x512.
+Download [MRAR index file](https://huggingface.co/zhendch/Transdiff/resolve/main/Imagenet2012_mrar_files.txt?download=true) and put it into root of project, if you want to train TransDiff with MRAR.
+
 ### (Optional) Caching VAE Latents
 
 Given that our data augmentation consists of simple center cropping and random flipping, 
