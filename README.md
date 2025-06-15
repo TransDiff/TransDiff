@@ -1,7 +1,7 @@
 # Marrying Autoregressive Transformer and Diffusion with Multi-Reference Autoregression <br><sub>Official PyTorch Implementation</sub>
 
 [![arXiv](https://img.shields.io/badge/arXiv%20paper-2506.09482-b31b1b.svg)](https://arxiv.org/pdf/2506.09482)&nbsp;
-[![huggingface](https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-Transdiff-yellow)](https://huggingface.co/zhendch/Transdiff)&nbsp;
+[![huggingface](https://img.shields.io/badge/%F0%9F%A4%97%20HuggingFace-TransDiff-yellow)](https://huggingface.co/zhendch/Transdiff)&nbsp;
 
 
 <p align="center">
@@ -21,10 +21,10 @@ This is a PyTorch/GPU implementation of the paper [Marrying Autoregressive Trans
 
 This repo contains:
 
-* 🪐 A simple PyTorch implementation of [Transdiff Model](models/transdiff.py) and [Transdiff Model with MRAR](models/transdiff_mrar.py)
-* ⚡️ Pre-trained class-conditional Transdiff models trained on ImageNet 256x256 and 512x512
-* 💥 A self-contained [notebook](demo.ipynb) for running various pre-trained Transdiff models
-* 🛸 An Transdiff [training and evaluation script](main.py) using PyTorch DDP
+* 🪐 A simple PyTorch implementation of [TransDiff Model](models/transdiff.py) and [TransDiff Model with MRAR](models/transdiff_mrar.py)
+* ⚡️ Pre-trained class-conditional TransDiff models trained on ImageNet 256x256 and 512x512
+* 💥 A self-contained [notebook](demo.ipynb) for running various pre-trained TransDiff models
+* 🛸 An TransDiff [training and evaluation script](main.py) using PyTorch DDP
 
 ## Preparation
 
@@ -48,22 +48,22 @@ conda env create -f environment.yaml
 conda activate transdiff
 ```
 
-For convenience, our pre-trained Transdiff models can be downloaded directly here as well:
+For convenience, our pre-trained TransDiff models can be downloaded directly here as well:
 
-| Transdiff Model                                                                                                                      | FID-50K | Inception Score | #params | 
+| TransDiff Model                                                                                                                      | FID-50K | Inception Score | #params | 
 |--------------------------------------------------------------------------------------------------------------------------------|---------|-----------------|---------|
-| [Transdiff-B](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_b/checkpoint-last.pth?download=true)             | 2.47    | 244.2           | 290M    |
-| [Transdiff-L](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l/checkpoint-last.pth?download=true)             | 2.25    | 244.3           | 683M    |
-| [Transdiff-H](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_h/checkpoint-last.pth?download=true)             | 1.69    | 282.0           | 1.3B    |
-| [Transdiff-B MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_b_mrar/checkpoint-last.pth?download=true)   | 1.49    | 282.2           | 290M    |
-| [Transdiff-L MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l_mrar/checkpoint-last.pth?download=true)   | 1.61    | 293.4           | 683M    |
-| [Transdiff-H MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_h_mrar/checkpoint-last.pth?download=true)   | 1.42    | 301.2           | 1.3B    |
-| [Transdiff-L 512x512](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l_512/checkpoint-last.pth?download=true) | 2.51    | 286.6           | 683M    |
+| [TransDiff-B](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_b/checkpoint-last.pth?download=true)             | 2.47    | 244.2           | 290M    |
+| [TransDiff-L](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l/checkpoint-last.pth?download=true)             | 2.25    | 244.3           | 683M    |
+| [TransDiff-H](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_h/checkpoint-last.pth?download=true)             | 1.69    | 282.0           | 1.3B    |
+| [TransDiff-B MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_b_mrar/checkpoint-last.pth?download=true)   | 1.49    | 282.2           | 290M    |
+| [TransDiff-L MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l_mrar/checkpoint-last.pth?download=true)   | 1.61    | 293.4           | 683M    |
+| [TransDiff-H MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_h_mrar/checkpoint-last.pth?download=true)   | 1.42    | 301.2           | 1.3B    |
+| [TransDiff-L 512x512](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l_512/checkpoint-last.pth?download=true) | 2.51    | 286.6           | 683M    |
 
 ### (Optional) Caching VAE Latents
 
 Given that our data augmentation consists of simple center cropping and random flipping, 
-the VAE latents can be pre-computed and saved to `CACHED_PATH` to save computations during Transdiff training:
+the VAE latents can be pre-computed and saved to `CACHED_PATH` to save computations during TransDiff training:
 
 ```
 torchrun --nproc_per_node=8 --nnodes=1 --node_rank=0 \
@@ -79,7 +79,7 @@ main_cache.py \
 Run our interactive visualization [demo](demo.ipynb).
 
 ### Training
-Script for the Transdiff-L 1StepAR setting (Pretrain Transdiff-L with a width of 1024 channels, 800 epochs):
+Script for the TransDiff-L 1StepAR setting (Pretrain TransDiff-L with a width of 1024 channels, 800 epochs):
 ```
 torchrun --nproc_per_node=8 --nnodes=8 --node_rank=${NODE_RANK} --master_addr=${MASTER_ADDR} --master_port=${MASTER_PORT} \
 main.py \
@@ -96,7 +96,7 @@ main.py \
 - (Optional) If the error 'Loss is nan, stopping training' frequently occurs during training when using mixed precision training with 'torch.cuda.amp.autocast()', you can add `--bf16` to the arguments.
 - (Optional) If necessary, you can use gradient accumulation by setting `--gradient_accumulation_steps n`.
 
-Script for the Transdiff-L MRAR setting (Finetune Transdiff-L MRAR with a width of 1024 channels, 40 epochs):
+Script for the TransDiff-L MRAR setting (Finetune TransDiff-L MRAR with a width of 1024 channels, 40 epochs):
 ```
 torchrun --nproc_per_node=8 --nnodes=8 --node_rank=${NODE_RANK} --master_addr=${MASTER_ADDR} --master_port=${MASTER_PORT} \
 main.py \
@@ -107,7 +107,7 @@ main.py \
 --output_dir ${OUTPUT_DIR} --resume ${Transdiff-L_1StepAR_DIR} \
 --data_path ${IMAGENET_PATH}
 ```
-Script for the Transdiff-L 512x512 setting (Finetune Transdiff-L 512x512 with a width of 1024 channels, 150 epochs):
+Script for the TransDiff-L 512x512 setting (Finetune TransDiff-L 512x512 with a width of 1024 channels, 150 epochs):
 ```
 torchrun --nproc_per_node=8 --nnodes=8 --node_rank=${NODE_RANK} --master_addr=${MASTER_ADDR} --master_port=${MASTER_PORT} \
 main.py \
@@ -122,7 +122,7 @@ main.py \
 
 ### Evaluation (ImageNet 256x256 and 512x512)
 
-Evaluate Transdiff-L 1StepAR with classifier-free guidance:
+Evaluate TransDiff-L 1StepAR with classifier-free guidance:
 ```
 torchrun --nproc_per_node=8 --nnodes=1 --node_rank=0 \
 main.py \
@@ -133,7 +133,7 @@ main.py \
 --cfg 1.3 --scale_0 0.89 --scale_1 0.95
 ```
 
-Evaluate Transdiff-L MRAR with classifier-free guidance:
+Evaluate TransDiff-L MRAR with classifier-free guidance:
 ```
 torchrun --nproc_per_node=8 --nnodes=1 --node_rank=0 \
 main.py \
@@ -144,7 +144,7 @@ main.py \
 --cfg 1.3 --scale_0 0.91 --scale_1 0.93
 ```
 
-Evaluate Transdiff-L 512x512 with classifier-free guidance:
+Evaluate TransDiff-L 512x512 with classifier-free guidance:
 ```
 torchrun --nproc_per_node=8 --nnodes=1 --node_rank=0 \
 main.py \
@@ -157,15 +157,15 @@ main.py \
 
 More settings for Benchmark in paper:
 
-| Transdiff Model     | cfg  | scale_0 | scale_1 | 
+| TransDiff Model     | cfg  | scale_0 | scale_1 | 
 |---------------------|------|---------|---------|
-| Transdiff-B         | 1.30 | 0.87    | 0.91    |
-| Transdiff-L         | 1.30 | 0.89    | 0.95    |
-| Transdiff-H         | 1.23 | 0.87    | 0.93    |
-| Transdiff-B MRAR    | 1.30 | 0.87    | 0.91    |
-| Transdiff-L MRAR    | 1.30 | 0.91    | 0.93    |
-| Transdiff-H MRAR    | 1.28 | 0.87    | 0.91    |
-| Transdiff-L 512x512 | 1.30 | 0.87    | 0.87    |
+| TransDiff-B         | 1.30 | 0.87    | 0.91    |
+| TransDiff-L         | 1.30 | 0.89    | 0.95    |
+| TransDiff-H         | 1.23 | 0.87    | 0.93    |
+| TransDiff-B MRAR    | 1.30 | 0.87    | 0.91    |
+| TransDiff-L MRAR    | 1.30 | 0.91    | 0.93    |
+| TransDiff-H MRAR    | 1.28 | 0.87    | 0.91    |
+| TransDiff-L 512x512 | 1.30 | 0.87    | 0.87    |
 
 ## Acknowledgements
 A large portion of codes in this repo is based on [MAR](https://github.com/LTH14/mar), [diffusers](https://github.com/huggingface/diffusers) and [timm](https://github.com/huggingface/pytorch-image-models).
