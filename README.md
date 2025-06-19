@@ -104,7 +104,7 @@ Script for the TransDiff-L MRAR setting (Finetune TransDiff-L MRAR with a width 
 ```
 torchrun --nproc_per_node=8 --nnodes=8 --node_rank=${NODE_RANK} --master_addr=${MASTER_ADDR} --master_port=${MASTER_PORT} \
 main.py \
---img_size 256 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 1 \
+--img_size 256 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 2 \
 --model transdiff_large --mrar --bf16 \
 --diffusion_batch_mul 2 \
 --epochs 40 --warmup_epochs 10 --lr 5.0e-5 --batch_size 16 --gradient_accumulation_steps 2 \
