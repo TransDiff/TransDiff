@@ -22,7 +22,6 @@ class Transdiff(nn.Module):
                  attn_dropout=0.1,
                  proj_dropout=0.1,
                  buffer_size=64,
-                 diffloss_w=1024,
                  num_sampling_steps='100',
                  diffusion_batch_mul=4,
                  grad_checkpointing=False,
@@ -69,8 +68,8 @@ class Transdiff(nn.Module):
                                 proj_drop=proj_dropout, attn_drop=attn_dropout) for _ in range(decoder_depth)])
         self.diffdecoder = DiffDecoder(
             target_channels=self.token_embed_dim,
-            z_channels=decoder_embed_dim,
-            width=diffloss_w,
+            z_channels=encoder_embed_dim,
+            width=decoder_embed_dim,
             diff_seqlen=self.seq_len * (self.img_size // 256) ** 2,
             num_sampling_steps=num_sampling_steps,
             blocks=decoder_blocks,

@@ -17,7 +17,7 @@ def _prepare_4d_attention_mask_for_sdpa(pre_len, seq_len, patch_size):
     attn_mask_converter = AttentionMaskConverter(is_causal=False, sliding_window=None)
     expanded_4d_mask = attn_mask_converter.to_4d(
             attention_mask_2d=torch.ones((1, pre_len + seq_len)),
-            query_length=64 + seq_len,
+            query_length=pre_len + seq_len,
             dtype=dtype,
         )
     expanded_4d_mask = AttentionMaskConverter._unmask_unattended(
@@ -33,7 +33,7 @@ def _prepare_4d_attention_mask_for_sdpa(pre_len, seq_len, patch_size):
 
 
 class Transdiff(nn.Module):
-    def __init__(self, img_size=256, patch_size=1,
+    def __init__(self, img_size=256, patch_size=2,
                  encoder_embed_dim=1024, encoder_depth=16, encoder_num_heads=16,
                  decoder_embed_dim=1024, decoder_depth=16, decoder_num_heads=16,
                  mlp_ratio=4., norm_layer=nn.LayerNorm,
@@ -43,7 +43,6 @@ class Transdiff(nn.Module):
                  attn_dropout=0.1,
                  proj_dropout=0.1,
                  buffer_size=64,
-                 diffloss_w=1024,
                  num_sampling_steps='100',
                  diffusion_batch_mul=4,
                  grad_checkpointing=False,
@@ -69,7 +68,7 @@ class Transdiff(nn.Module):
         self.fake_latent = nn.Parameter(torch.zeros(1, encoder_embed_dim))
 
         # --------------------------------------------------------------------------
-        self.z_proj = nn.Linear(self.token_embed_dim * 4, encoder_embed_dim, bias=True)
+        self.z_proj = nn.Linear(self.token_embed_dim, encoder_embed_dim, bias=True)
         self.z_proj_ln = nn.LayerNorm(encoder_embed_dim, eps=1e-6)
         self.buffer_size = buffer_size
         self.mask_token = nn.Parameter(torch.zeros(1, 64, decoder_embed_dim))
@@ -90,9 +89,9 @@ class Transdiff(nn.Module):
                                 num_heads=decoder_num_heads, mlp_ratio=mlp_ratio, qkv_bias=True, norm_layer=norm_layer,
                                 proj_drop=proj_dropout, attn_drop=attn_dropout) for _ in range(decoder_depth)])
         self.diffdecoder = DiffDecoder(
-            target_channels=self.token_embed_dim,
-            z_channels=decoder_embed_dim,
-            width=diffloss_w,
+            target_channels=self.vae_embed_dim,
+            z_channels=encoder_embed_dim,
+            width=decoder_embed_dim,
             diff_seqlen=self.seq_len * (self.img_size // 256) ** 2,
             num_sampling_steps=num_sampling_steps,
             blocks=decoder_blocks,
@@ -150,8 +149,7 @@ class Transdiff(nn.Module):
     def forward_encoder(self, x, class_embedding):
         x = self.z_proj(x)
         bsz, seq_len, embed_dim = x.shape
-        x = torch.cat([torch.zeros(bsz, self.buffer_size, embed_dim, device=x.device, dtype=x.dtype), x],
-                      dim=1)
+        x = torch.cat([torch.zeros(bsz, self.buffer_size, embed_dim, device=x.device, dtype=x.dtype), x], dim=1)
 
         # random drop class embedding during training
         if self.training:
@@ -179,7 +177,7 @@ class Transdiff(nn.Module):
         x = self.encoder_norm(x)
 
         x = x[:, self.buffer_size:]
-        x = x + self.diffusion_pos_embed_learned
+        # x = x + self.diffusion_pos_embed_learned
         return x
 
     def forward_loss(self, z, target):
@@ -194,21 +192,21 @@ class Transdiff(nn.Module):
         class_embedding = self.class_emb(labels)
 
         # patchify
-        gt_latents0 = self.patchify(img0).clone().detach()  # [bsz, 256, 16]
-        gt_latents1 = self.patchify(img1).clone().detach()  # [bsz, 256, 16]
-        gt_latents2 = self.patchify(img2).clone().detach()  # [bsz, 256, 16]
-        gt_latents3 = self.patchify(img3).clone().detach()  # [bsz, 256, 16]
+        gt_latents0 = self.patchify(img0, hw=16, patch_size=1).clone().detach()  # [bsz, 256, 16]
+        gt_latents1 = self.patchify(img1, hw=16, patch_size=1).clone().detach()  # [bsz, 256, 16]
+        gt_latents2 = self.patchify(img2, hw=16, patch_size=1).clone().detach()  # [bsz, 256, 16]
+        gt_latents3 = self.patchify(img3, hw=16, patch_size=1).clone().detach()  # [bsz, 256, 16]
         x0 = self.patchify(img0, hw=8, patch_size=2).clone()  # [bsz, 64, 16*4]
         x1 = self.patchify(img1, hw=8, patch_size=2).clone()  # [bsz, 64, 16*4]
         x2 = self.patchify(img2, hw=8, patch_size=2).clone()  # [bsz, 64, 16*4]
 
-        x = torch.zeros((x0.size(0), self.seq_len, self.token_embed_dim * 4), device=x0.device, dtype=x0.dtype)
+        x = torch.zeros((x0.size(0), self.seq_len, self.token_embed_dim), device=x0.device, dtype=x0.dtype)
         x[:, 64: 128, :] = x0
         x[:, 128: 192, :] = x1
         x[:, 192: 256, :] = x2
         # transformer encoder
         z = self.forward_encoder(x, class_embedding)
-
+        z = z + self.diffusion_pos_embed_learned[:, :z.size(1), :]
         # diffusion deocder
         z0, z1, z2, z3 = z[:, : 64], z[:, : 128], z[:, : 192], z[:, : 256]
         loss0 = self.forward_loss(z=z0, target=gt_latents0)
@@ -222,7 +220,7 @@ class Transdiff(nn.Module):
         bsz = labels.size(0)
         if type(cfg) == float:
             cfg = [cfg] * 4
-        tokens = torch.zeros(bsz, self.seq_len, self.token_embed_dim * 4).cuda()
+        tokens = torch.zeros(bsz, self.seq_len, self.token_embed_dim).cuda()
         class_embedding = self.class_emb(labels)
         noise = None
         for i in range(4):
@@ -234,9 +232,9 @@ class Transdiff(nn.Module):
                 cur_tokens = torch.cat([cur_tokens, cur_tokens], dim=0)
                 cur_class_embedding = torch.cat([class_embedding, self.fake_latent.repeat(bsz, 1)], dim=0)
             z = self.forward_encoder(cur_tokens[:, :64 * (i + 1), :], cur_class_embedding)
-
+            z = z + self.diffusion_pos_embed_learned[:, :z.size(1), :]
             if i == 0 and noise is None:
-                noise = randn_tensor((bsz, 256, self.token_embed_dim), generator=None, device=z.device, dtype=z.dtype)
+                noise = randn_tensor((bsz, 256, self.vae_embed_dim), generator=None, device=z.device, dtype=z.dtype)
 
             if sampler == 'maruyama':
                 sampled_token_latent = euler_maruyama_sampler(model=self.diffdecoder.net, latents=noise,
@@ -247,7 +245,7 @@ class Transdiff(nn.Module):
                 # sampled_token_latent = self.diffdecoder.sample(z[:, : 64 * (i + 1)], noise=noise,
                 #                                             num_sampling_steps=num_sampling_steps, cfg=cfg[i])
                 raise Exception("sampler must be maruyama.")
-            tmp_tokens = self.unpatchify(sampled_token_latent, hw=16).to(torch.float32)
+            tmp_tokens = self.unpatchify(sampled_token_latent, hw=16, patch_size=1).to(torch.float32)
 
         res_tokens = tmp_tokens
         return res_tokens

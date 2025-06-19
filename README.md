@@ -88,7 +88,7 @@ Script for the TransDiff-L 1StepAR setting (Pretrain TransDiff-L with a width of
 torchrun --nproc_per_node=8 --nnodes=8 --node_rank=${NODE_RANK} --master_addr=${MASTER_ADDR} --master_port=${MASTER_PORT} \
 main.py \
 --img_size 256 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 1 \
---model transdiff_large --diffloss_w 1024 \
+--model transdiff_large \
 --diffusion_batch_mul 4 \
 --epochs 800 --warmup_epochs 100 --blr 1.0e-4 --batch_size 32 \
 --output_dir ${OUTPUT_DIR} --resume ${OUTPUT_DIR} \
@@ -105,7 +105,7 @@ Script for the TransDiff-L MRAR setting (Finetune TransDiff-L MRAR with a width 
 torchrun --nproc_per_node=8 --nnodes=8 --node_rank=${NODE_RANK} --master_addr=${MASTER_ADDR} --master_port=${MASTER_PORT} \
 main.py \
 --img_size 256 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 1 \
---model transdiff_large --diffloss_w 1024 --mrar --bf16 \
+--model transdiff_large --mrar --bf16 \
 --diffusion_batch_mul 2 \
 --epochs 40 --warmup_epochs 10 --lr 5.0e-5 --batch_size 16 --gradient_accumulation_steps 2 \
 --output_dir ${OUTPUT_DIR} --resume ${Transdiff-L_1StepAR_DIR} \
@@ -116,7 +116,7 @@ Script for the TransDiff-L 512x512 setting (Finetune TransDiff-L 512x512 with a 
 torchrun --nproc_per_node=8 --nnodes=8 --node_rank=${NODE_RANK} --master_addr=${MASTER_ADDR} --master_port=${MASTER_PORT} \
 main.py \
 --img_size 512 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 1 \
---model transdiff_large --diffloss_w 1024 --ema_rate 0.999 --bf16 \
+--model transdiff_large --ema_rate 0.999 --bf16 \
 --diffusion_batch_mul 4 \
 --epochs 150 --warmup_epochs 10 --lr 1.0e-4 --batch_size 16 --gradient_accumulation_steps 2 \
 --only_train_diff \
@@ -131,7 +131,7 @@ Evaluate TransDiff-L 1StepAR with classifier-free guidance:
 torchrun --nproc_per_node=8 --nnodes=1 --node_rank=0 \
 main.py \
 --img_size 256 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 1 \
---model transdiff_large --diffloss_w 1024 \
+--model transdiff_large \
 --output_dir ${OUTPUT_DIR} --resume ckpt/transdiff_l/ \
 --evaluate --eval_bsz 256 --num_images 50000 \
 --cfg 1.3 --scale_0 0.89 --scale_1 0.95
@@ -141,11 +141,11 @@ Evaluate TransDiff-L MRAR with classifier-free guidance:
 ```
 torchrun --nproc_per_node=8 --nnodes=1 --node_rank=0 \
 main.py \
---img_size 256 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 1 \
---model transdiff_large --diffloss_w 1024 \
+--img_size 256 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 2 \
+--model transdiff_large \
 --output_dir ${OUTPUT_DIR} --resume ckpt/transdiff_l_mrar/ \
 --evaluate --eval_bsz 256 --num_images 50000 \
---cfg 1.3 --scale_0 0.91 --scale_1 0.93
+--cfg 1.3 --scale_0 0.925 --scale_1 0.95
 ```
 
 Evaluate TransDiff-L 512x512 with classifier-free guidance:
@@ -153,7 +153,7 @@ Evaluate TransDiff-L 512x512 with classifier-free guidance:
 torchrun --nproc_per_node=8 --nnodes=1 --node_rank=0 \
 main.py \
 --img_size 512 --vae_path ckpt/vae/kl16.ckpt --vae_embed_dim 16 --patch_size 1 \
---model transdiff_large --diffloss_w 1024 \
+--model transdiff_large \
 --output_dir ${OUTPUT_DIR} --resume ckpt/transdiff_l_512/ \
 --evaluate --eval_bsz 64 --num_images 50000 \
 --cfg 1.3 --scale_0 0.87 --scale_1 0.87
@@ -167,7 +167,7 @@ More settings for Benchmark in paper:
 | TransDiff-L         | 1.30 | 0.89    | 0.95    |
 | TransDiff-H         | 1.23 | 0.87    | 0.93    |
 | TransDiff-B MRAR    | 1.30 | 0.87    | 0.91    |
-| TransDiff-L MRAR    | 1.30 | 0.91    | 0.93    |
+| TransDiff-L MRAR    | 1.30 | 0.925   | 0.95    |
 | TransDiff-H MRAR    | 1.28 | 0.87    | 0.91    |
 | TransDiff-L 512x512 | 1.30 | 0.87    | 0.87    |
 

@@ -82,7 +82,6 @@ def get_args_parser():
     parser.add_argument('--buffer_size', type=int, default=64)
 
     # Diffusion params
-    parser.add_argument('--diffloss_w', type=int, default=1536)
     parser.add_argument('--num_sampling_steps', type=str, default="100")
     parser.add_argument('--diffusion_batch_mul', type=int, default=1)
     parser.add_argument('--temperature', default=1.0, type=float, help='diffusion loss sampling temperature')
@@ -226,7 +225,6 @@ def main(args):
             attn_dropout=args.attn_dropout,
             proj_dropout=args.proj_dropout,
             buffer_size=args.buffer_size,
-            diffloss_w=args.diffloss_w,
             num_sampling_steps=args.num_sampling_steps,
             diffusion_batch_mul=args.diffusion_batch_mul,
             grad_checkpointing=args.grad_checkpointing,
@@ -242,7 +240,6 @@ def main(args):
             attn_dropout=args.attn_dropout,
             proj_dropout=args.proj_dropout,
             buffer_size=args.buffer_size,
-            diffloss_w=args.diffloss_w,
             num_sampling_steps=args.num_sampling_steps,
             diffusion_batch_mul=args.diffusion_batch_mul,
             grad_checkpointing=args.grad_checkpointing,
