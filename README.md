@@ -53,10 +53,10 @@ For convenience, our pre-trained TransDiff models can be downloaded directly her
 | TransDiff Model                                                                                                                      | FID-50K | Inception Score | #params | 
 |--------------------------------------------------------------------------------------------------------------------------------|---------|-----------------|---------|
 | [TransDiff-B](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_b/checkpoint-last.pth?download=true)             | 2.47    | 244.2           | 290M    |
-| [TransDiff-L](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l/checkpoint-last.pth?download=true)             | 2.25    | 244.3           | 683M    |
-| [TransDiff-H](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_h/checkpoint-last.pth?download=true)             | 1.69    | 282.0           | 1.3B    |
-| [TransDiff-B MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_b_mrar/checkpoint-last.pth?download=true)   | 1.49    | 282.2           | 290M    |
-| [TransDiff-L MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l_mrar/checkpoint-last.pth?download=true)   | 1.61    | 293.4           | 683M    |
+| [TransDiff-L](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l/checkpoint-last.pth?download=true)             | 1.69    | 244.3           | 683M    |
+| [TransDiff-H](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_h/checkpoint-last.pth?download=true)             | 1.61    | 282.0           | 1.3B    |
+| [TransDiff-B MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_b_mrar/checkpoint-last.pth?download=true)   |  2.25   | 282.2           | 290M    |
+| [TransDiff-L MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l_mrar/checkpoint-last.pth?download=true)   | 1.49    | 293.4           | 683M    |
 | [TransDiff-H MRAR](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_h_mrar/checkpoint-last.pth?download=true)   | 1.42    | 301.2           | 1.3B    |
 | [TransDiff-L 512x512](https://huggingface.co/zhendch/Transdiff/resolve/main/transdiff_l_512/checkpoint-last.pth?download=true) | 2.51    | 286.6           | 683M    |
 
@@ -167,7 +167,7 @@ More settings for Benchmark in paper:
 | TransDiff-L         | 1.30 | 0.89    | 0.95    |
 | TransDiff-H         | 1.23 | 0.87    | 0.93    |
 | TransDiff-B MRAR    | 1.30 | 0.87    | 0.91    |
-| TransDiff-L MRAR    | 2.25 | 0.925   | 0.95    |
+| TransDiff-L MRAR    | 1.30 | 0.925   | 0.95    |
 | TransDiff-H MRAR    | 1.28 | 0.87    | 0.91    |
 | TransDiff-L 512x512 | 1.30 | 0.87    | 0.87    |
 
