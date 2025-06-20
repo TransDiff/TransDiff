@@ -167,7 +167,7 @@ More settings for Benchmark in paper:
 | TransDiff-L         | 1.30 | 0.89    | 0.95    |
 | TransDiff-H         | 1.23 | 0.87    | 0.93    |
 | TransDiff-B MRAR    | 1.30 | 0.87    | 0.91    |
-| TransDiff-L MRAR    | 1.30 | 0.925   | 0.95    |
+| TransDiff-L MRAR    | 2.25 | 0.925   | 0.95    |
 | TransDiff-H MRAR    | 1.28 | 0.87    | 0.91    |
 | TransDiff-L 512x512 | 1.30 | 0.87    | 0.87    |
 
